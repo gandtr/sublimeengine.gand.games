@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE SUBLIME ENGINE — an Ottoman steampunk adventure · Gand Games</title>
+<meta name="description" content="An alternate 1930s where the Ottoman Empire survived, constitutionalised and won the Great War. You are a Telegraph &amp; Antiquities clerk who receives the wrong parcel at Sirkeci Station. A point-and-click adventure from Gand Games.">
+<link rel="canonical" href="https://sublimeengine.gand.games/">
+<meta name="theme-color" content="#121216">
+<meta property="og:type" content="website">
+<meta property="og:title" content="THE SUBLIME ENGINE — an Ottoman steampunk adventure">
+<meta property="og:description" content="The wrong parcel at Sirkeci Station. A machine that predicts revolutions — and causes them by being believed.">
+<meta property="og:url" content="https://sublimeengine.gand.games/">
+<meta property="og:image" content="https://sublimeengine.gand.games/public/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="public/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="public/apple-touch-icon.png">
+<style>
+/* ── Devlet-i Aliyye · Ministry of Communications and Antiquities · docket stock ── */
+@font-face{font-family:"Cinzel";src:url(public/fonts/cinzel-latin.woff2) format("woff2");font-weight:400 700;font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Cinzel";src:url(public/fonts/cinzel-latinext.woff2) format("woff2");font-weight:400 700;font-display:swap;
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Special Elite";src:url(public/fonts/elite.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Courier Prime";src:url(public/fonts/courier.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Courier Prime";src:url(public/fonts/courier-bold.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Courier Prime";src:url(public/fonts/courier-italic.woff2) format("woff2");font-style:italic;font-display:swap}
+
+:root{
+  /* straight off tools/palette.json — the same ramps the game quantizes art to */
+  --soot:#121216; --soot-deep:#07070a; --soot-hi:#1e1e24;
+  --paper:#d8cfb8; --paper-hi:#e8e1cf; --shade:#b4ab96;
+  --ink:#1a140e; --ink-dim:#5c5342;
+  --brass:#b08a3c; --brass-hi:#dcb862; --brass-lo:#4a3512;
+  --red:#9c2420; --red-deep:#5e1212;
+  --verdigris:#245448; --lamp:#2a6a52;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--soot);
+  /* iron desk: deco lattice over a lamp-lit vignette */
+  background-image:
+    repeating-linear-gradient(45deg, rgba(7,7,10,.5) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(-45deg, rgba(7,7,10,.5) 0 1px, transparent 1px 16px),
+    radial-gradient(ellipse 130% 80% at 50% -8%, #24242c 0%, #15151a 48%, #0a0a0d 100%);
+  color:var(--ink);
+  font-family:"Courier Prime",ui-monospace,monospace;
+  font-size:17px; line-height:1.55;
+  padding:0 14px 90px;
+}
+/* soot in the air, over everything */
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:60; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── top strip ── */
+.masthead{
+  max-width:820px; margin:0 auto; padding:14px 4px 26px;
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  color:#7d7566; font-family:"Special Elite",monospace; font-size:13px; letter-spacing:.14em;
+}
+.masthead a{color:var(--brass-hi); text-decoration:none; border-bottom:2px solid var(--red); padding-bottom:1px}
+.masthead a:hover,.masthead a:focus-visible{color:#fff; background:var(--red); outline:none}
+.masthead .fileno{color:#7d7566}
+@media (max-width:600px){.masthead{flex-direction:column;gap:6px;align-items:flex-start}}
+
+/* ── documents ── */
+.doc{
+  position:relative; max-width:780px; margin:0 auto 58px;
+  background:var(--paper); border:2px solid var(--soot-deep);
+  box-shadow:8px 10px 0 rgba(7,7,10,.85);
+  padding:44px 48px 46px;
+}
+.doc::before{ /* laid paper */
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.09; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+.doc:nth-of-type(odd){transform:rotate(.3deg)}
+.doc:nth-of-type(even){transform:rotate(-.26deg)}
+@media (max-width:640px){.doc{padding:30px 20px 34px}}
+
+/* brass corner brackets — the ministry binds its dockets */
+.doc::after{
+  content:""; position:absolute; inset:8px; pointer-events:none;
+  border:1px solid rgba(176,138,60,.42);
+  clip-path:polygon(0 0,26px 0,26px 1px,1px 1px,1px 26px,0 26px,
+    0 100%,26px 100%,26px calc(100% - 1px),1px calc(100% - 1px),1px calc(100% - 26px),0 calc(100% - 26px),
+    100% 100%,calc(100% - 26px) 100%,calc(100% - 26px) calc(100% - 1px),calc(100% - 1px) calc(100% - 1px),calc(100% - 1px) calc(100% - 26px),100% calc(100% - 26px),
+    100% 0,calc(100% - 26px) 0,calc(100% - 26px) 1px,calc(100% - 1px) 1px,calc(100% - 1px) 26px,100% 26px);
+}
+
+/* docket tab */
+.tab{
+  position:absolute; top:-30px; left:26px; z-index:-1;
+  background:var(--shade); border:2px solid var(--soot-deep); border-bottom:none;
+  font-family:"Special Elite",monospace; font-size:12.5px; letter-spacing:.18em;
+  padding:5px 18px 14px; color:var(--ink);
+}
+.doc:nth-of-type(even) .tab{left:auto; right:26px}
+
+.rule{border:none; border-top:2px solid var(--ink); margin:14px 0 18px}
+.rule.brass{border-top:2px solid var(--brass); box-shadow:0 2px 0 rgba(74,53,18,.35)}
+
+.letterhead{font-family:"Special Elite",monospace; letter-spacing:.15em; font-size:13px; color:var(--ink-dim); text-transform:uppercase; line-height:1.7}
+.letterhead b{color:var(--ink)}
+/* keep the letterhead clear of the wax seal */
+@media (min-width:761px){.letterhead{padding-right:182px}}
+
+h1{
+  font-family:"Cinzel",Georgia,serif; font-weight:700;
+  font-size:clamp(38px,8.4vw,74px); line-height:1.0; letter-spacing:.005em;
+  margin:20px 0 8px; color:var(--ink);
+}
+h1 .brass{color:#7a5c1e}
+.tagline{font-family:"Special Elite",monospace; font-size:15.5px; color:var(--ink); margin:12px 0 0}
+.tagline em{font-style:normal; background:var(--red); color:var(--paper-hi); padding:1px 6px}
+
+h2{font-family:"Cinzel",Georgia,serif; font-weight:700; font-size:23px; letter-spacing:.04em; margin:0 0 4px; color:var(--ink)}
+h2 .no{color:var(--red)}
+h3{font-family:"Special Elite",monospace; font-size:14px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-dim); margin:26px 0 8px}
+
+p{margin:0 0 14px}
+.typed{max-width:58ch}
+.note{font-size:14px; color:var(--ink-dim); font-style:italic}
+.note-lead{margin-bottom:4px}
+.note-tail{margin-top:18px}
+.pull{
+  margin:22px 0; padding:14px 0 14px 20px; border-left:4px solid var(--red);
+  font-family:"Special Elite",monospace; font-size:16px; line-height:1.5; color:var(--ink);
+}
+
+/* wax seal */
+.seal{
+  position:absolute; top:30px; right:34px; z-index:5; width:142px; height:142px;
+  display:grid; place-items:center; text-align:center;
+  border-radius:50%; background:radial-gradient(circle at 38% 32%, #b8342c 0%, var(--red) 45%, var(--red-deep) 100%);
+  color:#f0dcc8; font-family:"Special Elite",monospace; font-size:12.5px; letter-spacing:.1em;
+  text-transform:uppercase; line-height:1.3; padding:0 14px;
+  box-shadow:inset 0 0 0 3px rgba(240,220,200,.32), inset 0 -6px 14px rgba(0,0,0,.45), 3px 5px 0 rgba(7,7,10,.5);
+  transform:rotate(-9deg);
+  animation:press .42s cubic-bezier(.2,1.7,.4,1) .5s both;
+}
+.seal small{display:block; font-size:9.5px; letter-spacing:.16em; margin-top:6px; opacity:.85}
+@keyframes press{from{opacity:0;transform:rotate(-18deg) scale(2.2)}70%{opacity:1;transform:rotate(-8deg) scale(.95)}to{opacity:.95;transform:rotate(-9deg) scale(1)}}
+@media (max-width:760px){.seal{position:static;margin:20px 0 0;transform:rotate(-4deg);animation-delay:.3s}}
+
+/* hero */
+.plate{position:relative; margin:28px 0 6px}
+.plate img{display:block; width:100%; height:auto; border:2px solid var(--soot-deep); outline:9px solid var(--paper-hi); outline-offset:-2px; box-shadow:7px 8px 0 rgba(7,7,10,.75); image-rendering:pixelated}
+.plate figcaption{font-family:"Special Elite",monospace; font-size:12.5px; letter-spacing:.13em; color:var(--ink-dim); margin-top:14px; text-align:center; text-transform:uppercase}
+
+.orderline{margin-top:26px}
+
+/* spec table — two columns of rows on wide screens, one when it gets tight */
+.spec{margin-top:24px; display:grid; grid-template-columns:1fr 1fr; column-gap:34px; border-top:2px solid var(--ink)}
+@media (max-width:620px){.spec{grid-template-columns:1fr}}
+.spec div{display:flex; justify-content:space-between; gap:14px; padding:7px 2px; border-bottom:1px solid var(--shade); font-size:14px}
+.spec span:first-child{font-family:"Special Elite",monospace; letter-spacing:.13em; font-size:12px; color:var(--ink-dim); padding-top:2px; white-space:nowrap}
+.spec span:last-child{text-align:right}
+.spec .hot{color:var(--red); font-weight:700}
+
+/* diagrams */
+.figure{margin:24px 0 6px; overflow-x:auto}
+.figure svg{display:block; width:100%; min-width:440px; height:auto}
+.figure figcaption{font-family:"Special Elite",monospace; font-size:12.5px; letter-spacing:.12em; color:var(--ink-dim); margin-top:12px; text-align:center; text-transform:uppercase}
+.dg-node{fill:var(--paper-hi); stroke:var(--ink); stroke-width:2}
+.dg-label{font-family:"Special Elite",monospace; font-size:12px; fill:var(--ink); letter-spacing:.06em}
+.dg-arrow{stroke:var(--ink); stroke-width:2; fill:none}
+.dg-cut{stroke:var(--red); stroke-width:2.5; fill:none; stroke-dasharray:7 5}
+.dg-cut-label{font-family:"Special Elite",monospace; font-size:11.5px; fill:var(--red); letter-spacing:.08em}
+.dg-mid{font-family:"Cinzel",Georgia,serif; font-weight:700; font-size:15px; fill:var(--red)}
+
+/* photographic record */
+.evidence{display:grid; grid-template-columns:1fr 1fr; gap:32px 28px; margin-top:26px}
+@media (max-width:640px){.evidence{grid-template-columns:1fr}}
+.evidence figure{position:relative; margin:0}
+.evidence figure:nth-child(odd){transform:rotate(-.8deg)}
+.evidence figure:nth-child(even){transform:rotate(.7deg)}
+.evidence a{display:block; border:2px solid var(--soot-deep); outline:7px solid var(--paper-hi); outline-offset:-2px;
+  box-shadow:6px 7px 0 rgba(7,7,10,.7); transition:transform .15s ease, box-shadow .15s ease}
+.evidence a:hover,.evidence a:focus-visible{transform:translate(-2px,-3px); box-shadow:9px 11px 0 rgba(7,7,10,.7); outline-color:var(--brass-hi)}
+.evidence img{display:block; width:100%; height:auto; image-rendering:pixelated}
+.evidence .stud{position:absolute; top:-10px; left:50%; width:13px; height:13px; background:var(--brass); border:2px solid var(--soot-deep); border-radius:50%; transform:translateX(-50%); z-index:2}
+.evidence figcaption{font-family:"Special Elite",monospace; font-size:12px; letter-spacing:.13em; color:var(--ink-dim); margin-top:10px; text-align:center; text-transform:uppercase}
+.evidence figure:last-child{grid-column:1/-1; width:min(74%,470px); margin:0 auto}
+
+/* verbs */
+.verbs{display:flex; flex-wrap:wrap; gap:9px; margin:16px 0 22px; list-style:none}
+.verbs li{font-family:"Special Elite",monospace; font-size:13.5px; letter-spacing:.1em; text-transform:uppercase;
+  border:2px solid var(--ink); background:var(--lamp); color:var(--paper-hi); padding:6px 13px; box-shadow:3px 3px 0 rgba(7,7,10,.55)}
+
+/* regulations */
+.regs{list-style:none; counter-reset:reg; margin-top:20px; max-width:60ch}
+.regs li{counter-increment:reg; position:relative; padding:10px 0 10px 3.2em; border-bottom:1px solid var(--shade)}
+.regs li::before{content:"§" counter(reg); position:absolute; left:2px; top:10px; font-family:"Special Elite",monospace; color:var(--red); font-size:15px}
+.regs b{font-weight:700}
+
+/* calls to action */
+.ctas{display:flex; flex-wrap:wrap; gap:14px; margin-top:20px}
+.btn{
+  font-family:"Special Elite",monospace; font-size:14px; letter-spacing:.15em; text-transform:uppercase;
+  border:2px solid var(--soot-deep); padding:11px 20px; text-decoration:none; color:var(--paper-hi);
+  background:var(--red); box-shadow:4px 5px 0 rgba(7,7,10,.8); transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover,.btn:focus-visible{transform:translate(-1px,-2px); box-shadow:6px 8px 0 rgba(7,7,10,.8); outline:none}
+.btn.ghost{background:transparent; color:var(--ink); box-shadow:4px 5px 0 rgba(7,7,10,.35)}
+.btn.ghost:hover{background:var(--ink); color:var(--paper-hi)}
+
+.colophon{
+  max-width:820px; margin:10px auto 0; text-align:center;
+  color:#7d7566; font-family:"Special Elite",monospace; font-size:12.5px; letter-spacing:.15em;
+}
+.colophon a{color:var(--brass-hi); text-decoration:none; border-bottom:2px solid var(--red)}
+.colophon a:hover{background:var(--red); color:#fff}
+.colophon .quote{display:block; margin-top:14px; font-style:italic; letter-spacing:.05em; color:#6a6357}
+
+@media (prefers-reduced-motion: no-preference){
+  .doc{animation:file-in .5s ease-out both}
+  .doc:nth-of-type(1){animation-delay:.05s}
+  .doc:nth-of-type(2){animation-delay:.14s}
+  .doc:nth-of-type(3){animation-delay:.22s}
+  .doc:nth-of-type(4){animation-delay:.30s}
+  .doc:nth-of-type(5){animation-delay:.38s}
+  @keyframes file-in{from{opacity:0; translate:0 26px} to{opacity:1; translate:0 0}}
+}
+@media (prefers-reduced-motion: reduce){.seal{animation:none}}
+::selection{background:var(--red); color:var(--paper-hi)}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <a href="https://gand.games/">← GAND GAMES</a>
+  <span class="fileno">DOSYA № SE-01 · TELGRAF VE ÂSÂR-I ATÎKA · MAHREMDİR</span>
+</header>
+
+<main>
+
+<!-- DOSYA 01 — THE PARCEL -->
+<section class="doc" aria-labelledby="t1">
+  <span class="tab">DOSYA 01 · TAYİN — THE POSTING</span>
+  <div class="seal" role="img" aria-label="Wax seal: in development">In<br>Develop&shy;ment<small>PC · GODOT 4</small></div>
+  <p class="letterhead">
+    <b>Devlet-i Aliyye</b> — The Ottoman Commonwealth<br>
+    Ministry of Communications and Antiquities · Telegraph &amp; Antiquities Service
+  </p>
+  <hr class="rule brass">
+  <h1 id="t1">THE SUBLIME<br><span class="brass">ENGINE</span></h1>
+  <p class="tagline">The proper channels may loop forever. <em>There is always one way in.</em></p>
+
+  <figure class="plate">
+    <img src="public/keyart.png" width="1920" height="1080" alt="A rigid airship, lit gold along its gondola, passing low over a night-time Istanbul of domes, minarets and mooring towers.">
+    <figcaption>Plate I — the Berlin mail, standing off Galata before dawn</figcaption>
+  </figure>
+
+  <div class="orderline">
+    <p class="typed">It is 1930-something, and the Ottoman Empire never fell. It reformed instead — constitutionalised, industrialised, and came out of the Great War on the winning side. Three continents of railways, telegraph exchanges, airship lanes and quarrelsome provinces, held together by timetables and bargaining.</p>
+    <p class="typed">You are a troubleshooter for the Telegraph &amp; Antiquities service. Part clerk, part engineer, part linguist. At Sirkeci Station a porter hands you a parcel with your name on it, and it is <b>not your parcel</b>.</p>
+    <p class="typed">Inside is a cipher cylinder that carries no message — only gear ratios. The ratios are railway timetables. Within the hour a German courier, a Soviet economist, an English antiquarian and a patient police inspector all want a word.</p>
+    <p class="note">A point-and-click adventure in the register of the hand-painted 1990s: eight verbs, no inventory-shaped keys, and a bureaucracy you argue with.</p>
+    <div class="spec">
+      <div><span>GENRE</span><span>POINT-AND-CLICK</span></div>
+      <div><span>ENGINE</span><span>GODOT 4.7 · GDSCRIPT</span></div>
+      <div><span>PLATFORM</span><span>LINUX · WINDOWS</span></div>
+      <div><span>DISPLAY</span><span>640×360, INTEGER</span></div>
+      <div><span>LANGUAGES</span><span>ENGLISH · TÜRKÇE</span></div>
+      <div><span>ISSUED BY</span><span>GAND GAMES</span></div>
+      <div><span>STATUS</span><span class="hot">IN DEVELOPMENT</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOSYA 02 — THE MACHINE -->
+<section class="doc" aria-labelledby="t2">
+  <span class="tab">DOSYA 02 · MİZAN — THE MACHINE</span>
+  <h2 id="t2"><span class="no">02 —</span> On a machine that predicts revolutions</h2>
+  <hr class="rule">
+  <p class="typed">Officially, <b>Project Mizan</b> was an economic planning calculator: rail capacity, grain supply, industrial output. Rooms of brass logic drums and punch cards, driven off a central steam shaft, because in this century a computer is a <em>building</em> and not a thing you carry.</p>
+  <p class="typed">Conspiracy theorists call it the Sublime Engine and say it predicts coups. You may safely assume this is pulp nonsense.</p>
+
+  <div class="pull">It does not merely predict crises. Powerful people began quietly acting on its forecasts — and the forecasts started coming true because they had been read.</div>
+
+  <figure class="figure">
+    <svg viewBox="0 0 660 300" role="img" aria-labelledby="loopttl">
+      <title id="loopttl">The feedback loop: a prediction of unrest causes arrests, the arrests cause unrest, the model is proved right, and the state trusts it further.</title>
+      <g class="dg-arrow">
+        <path d="M232 46 h196" marker-end="url(#ah)"/>
+        <path d="M560 78 v128" marker-end="url(#ah)"/>
+        <path d="M428 254 h-196" marker-end="url(#ah)"/>
+        <path d="M100 206 v-128" marker-end="url(#ah)"/>
+      </g>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#1a140e"/>
+        </marker>
+      </defs>
+      <rect class="dg-node" x="18"  y="18"  width="214" height="58" rx="2"/>
+      <rect class="dg-node" x="428" y="18"  width="214" height="58" rx="2"/>
+      <rect class="dg-node" x="428" y="226" width="214" height="58" rx="2"/>
+      <rect class="dg-node" x="18"  y="226" width="214" height="58" rx="2"/>
+      <text class="dg-label" x="125" y="43" text-anchor="middle">MIZAN FORECASTS</text>
+      <text class="dg-label" x="125" y="61" text-anchor="middle">UNREST IN THE PROVINCE</text>
+      <text class="dg-label" x="535" y="43" text-anchor="middle">THE MINISTRY,</text>
+      <text class="dg-label" x="535" y="61" text-anchor="middle">PRUDENTLY, MAKES ARRESTS</text>
+      <text class="dg-label" x="535" y="251" text-anchor="middle">THE ARRESTS</text>
+      <text class="dg-label" x="535" y="269" text-anchor="middle">CAUSE UNREST</text>
+      <text class="dg-label" x="125" y="251" text-anchor="middle">THE FORECAST WAS RIGHT.</text>
+      <text class="dg-label" x="125" y="269" text-anchor="middle">TRUST IT FURTHER.</text>
+      <text class="dg-mid" x="330" y="145" text-anchor="middle">THE LOOP TIGHTENS</text>
+      <text class="dg-label" x="330" y="170" text-anchor="middle">and every turn of it is evidence</text>
+    </svg>
+    <figcaption>Fig. 1 — why the machine is never wrong</figcaption>
+  </figure>
+
+  <p class="typed">The prime minister who commissioned it understood what had happened and ordered the project dismantled. It was not dismantled. He has been dead some years, and every faction in this story claims to be completing his work. All of them are wrong about what it was.</p>
+  <p class="note">This is an alternate history. Real people, places and institutions appear in circumstances that never happened, and nothing in it is a claim about any of them.</p>
+</section>
+
+<!-- DOSYA 03 — PHOTOGRAPHIC RECORD -->
+<section class="doc" aria-labelledby="t3">
+  <span class="tab">DOSYA 03 · ZABIT — THE RECORD</span>
+  <h2 id="t3"><span class="no">03 —</span> Photographic record</h2>
+  <hr class="rule">
+  <p class="note note-lead">Captured in engine at 640×360. Every background is lit by a source you can point at — a lamp, a furnace mouth, a signal lantern. Nothing in this world is lit by an overhead sun nobody pays for.</p>
+  <div class="evidence">
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/01_sirkeci.png"><img src="public/shots/01_sirkeci.png" width="1280" height="720" loading="lazy" alt="Sirkeci Station platform three before dawn: a steam locomotive under an iron-and-glass trainshed, a porter and an inspector in the lamplight, a departures board lettered in Ottoman script."></a><figcaption>04:50 — Sirkeci, platform 3</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/02_hotspots.png"><img src="public/shots/02_hotspots.png" width="1280" height="720" loading="lazy" alt="The same platform with every interactive hotspot outlined in brass and named: the waiting express, Inspector Feridun, the porter, the timetable board, the mysterious parcel."></a><figcaption>Hold Tab — every hotspot, named</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/03_papers.png"><img src="public/shots/03_papers.png" width="1280" height="720" loading="lazy" alt="The papers screen: Form 12-B needs a stamp, a queue number and a form, and the note beneath reads every office is waiting for another office."></a><figcaption>The papers — a closed ring</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/04_galata.png"><img src="public/shots/04_galata.png" width="1280" height="720" loading="lazy" alt="A radio engineer's cluttered workshop in Galata: a green banker's lamp over a bench of brass instruments, the Galata tower framed in the window."></a><figcaption>06:15 — Benaroya's workshop</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/05_dispatch.png"><img src="public/shots/05_dispatch.png" width="1280" height="720" loading="lazy" alt="The Ministry dispatch hall: a wall of numbered pneumatic tube mouths under a gilded imperial cypher, with a rack of routing labels alongside."></a><figcaption>03:10 — Ministry dispatch hall</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/06_coffeehouse.png"><img src="public/shots/06_coffeehouse.png" width="1280" height="720" loading="lazy" alt="A Galata coffeehouse before dawn: a copper samovar, stained-glass lamps, and three strangers waiting at separate tables."></a><figcaption>05:20 — three strangers, waiting</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/07_compartment.png"><img src="public/shots/07_compartment.png" width="1280" height="720" loading="lazy" alt="A sleeper compartment on the Taurus Express: marquetry panelling, a green-shaded lamp, a glass of tea, and the lit windows of the train curving away outside."></a><figcaption>05:02 — the Taurus Express</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/08_cappadocia.png"><img src="public/shots/08_cappadocia.png" width="1280" height="720" loading="lazy" alt="Eight levels down in a Cappadocian underground city: a brass calculating machine of stacked drums beside an enormous carved stone door."></a><figcaption>Cappadocia — the eighth level</figcaption></figure>
+    <figure><span class="stud" aria-hidden="true"></span><a href="public/shots/09_gondola.png"><img src="public/shots/09_gondola.png" width="1280" height="720" loading="lazy" alt="The chart room in an airship gondola over the Aegean: a map table, a brass helm, and a wall of windows full of cloud and sea."></a><figcaption>The Murat Reis, over the Aegean</figcaption></figure>
+  </div>
+</section>
+
+<!-- DOSYA 04 — THE PROPER CHANNELS -->
+<section class="doc" aria-labelledby="t4">
+  <span class="tab">DOSYA 04 · USUL — THE PROPER CHANNELS</span>
+  <h2 id="t4"><span class="no">04 —</span> How it plays</h2>
+  <hr class="rule">
+
+  <h3>Eight verbs</h3>
+  <p class="typed">Chosen so that talking your way past a clerk carries the same weight as opening a door with a crowbar.</p>
+  <ul class="verbs">
+    <li>Talk to</li><li>Inspect</li><li>Use</li><li>Combine</li>
+    <li>Distract</li><li>Bluff</li><li>Repair</li><li>Decode</li>
+  </ul>
+
+  <h3>The bureaucracy is the puzzle</h3>
+  <p class="typed">A document is a dependency graph of endorsements, and the legitimate path is <b>allowed to be a closed ring</b>. The stamp needs the form. The form needs the queue number. The queue number needs the stamp. That circle is the joke and it is also the lock.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 660 312" role="img" aria-labelledby="ringttl">
+      <title id="ringttl">A closed ring: the stamp requires the form, the form requires the queue number, the queue number requires the stamp — and a dashed red shortcut cuts into the ring from outside.</title>
+      <defs>
+        <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#1a140e"/>
+        </marker>
+        <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#9c2420"/>
+        </marker>
+      </defs>
+      <!-- the ring: stamp -> form -> queue number -> stamp -->
+      <g class="dg-arrow">
+        <path d="M418 126 C 470 146, 486 176, 492 206" marker-end="url(#ah2)"/>
+        <path d="M444 268 C 380 288, 280 288, 216 268" marker-end="url(#ah2)"/>
+        <path d="M168 206 C 174 176, 190 146, 242 126" marker-end="url(#ah2)"/>
+      </g>
+      <rect class="dg-node" x="242" y="72"  width="176" height="52" rx="2"/>
+      <rect class="dg-node" x="444" y="206" width="196" height="52" rx="2"/>
+      <rect class="dg-node" x="20"  y="206" width="196" height="52" rx="2"/>
+      <text class="dg-label" x="330" y="95"  text-anchor="middle">THE STAMP</text>
+      <text class="dg-label" x="330" y="113" text-anchor="middle">requires the form</text>
+      <text class="dg-label" x="542" y="229" text-anchor="middle">THE FORM</text>
+      <text class="dg-label" x="542" y="247" text-anchor="middle">requires the queue number</text>
+      <text class="dg-label" x="118" y="229" text-anchor="middle">THE QUEUE NUMBER</text>
+      <text class="dg-label" x="118" y="247" text-anchor="middle">requires the stamp</text>
+      <!-- the way in: cuts the ring from outside -->
+      <text class="dg-cut-label" x="330" y="18" text-anchor="middle">A BRIBE · A FORGERY · A FAVOUR · A PLAUSIBLE LIE</text>
+      <path class="dg-cut" d="M330 28 v32" marker-end="url(#ah3)"/>
+    </svg>
+    <figcaption>Fig. 2 — the ring, and the way in</figcaption>
+  </figure>
+
+  <h3>House rules</h3>
+  <ol class="regs">
+    <li><b>Bureaucracy is funny; its consequences are not.</b>&nbsp;A form that cannot be filed is comedy. A person who cannot be found because a file was moved is not.</li>
+    <li><b>Everyone is polite.</b>&nbsp;Spies keep meeting socially. Enemies share tables. The manners are real and so are the stakes.</li>
+    <li>Technology is <b>infrastructural</b>. If a puzzle could be solved by a device in someone's pocket, it is the wrong puzzle for this world.</li>
+    <li>The alternate history creates <b>new problems, never a utopia</b>. Anything that reads as wish-fulfilment is wrong.</li>
+    <li><b>No ethnicity is the villain.</b>&nbsp;The antagonist is an idea about how states should be governed, held by a man who believes he is finishing a hero's work.</li>
+    <li>Failure should usually produce a comic consequence or another route — <b>not a game-over screen</b>.</li>
+    <li>The whole chapter is played by the test suite, start to finish, because a puzzle chain can be correct at every link and still be <b>unwinnable as a whole</b>.</li>
+  </ol>
+
+  <h3>Turkish, properly</h3>
+  <p class="typed">The game ships in English and Turkish. The Turkish is not a gloss: it is written in an Ottoman register to match the setting, verb-last with the case suffixes no template can inflect, which is why the sentence templates are themselves translated. <b>Devlet-i Aliyye</b> is not a translation of "the Commonwealth" — it is what the Ottomans called their own state.</p>
+</section>
+
+<!-- DOSYA 05 — NOTIFICATION -->
+<section class="doc" aria-labelledby="t5">
+  <span class="tab">DOSYA 05 · İSTİDA — THE REQUEST</span>
+  <h2 id="t5"><span class="no">05 —</span> Notification of release</h2>
+  <hr class="rule">
+  <p class="typed">No storefront has been assigned to this docket yet. To be notified when it opens, file a request with the issuing office — or consult the bureau's public board.</p>
+  <div class="ctas">
+    <a class="btn" href="mailto:contact@gand.tr?subject=The%20Sublime%20Engine%20%E2%80%94%20notify%20me">File a request ✉</a>
+    <a class="btn ghost" href="https://gand.games/">The bureau · gand.games ↗</a>
+  </div>
+  <p class="note note-tail">Issued by Gand Games. No ads. No tracking. The price, when it is assigned, is the price.</p>
+</section>
+
+</main>
+
+<footer class="colophon">
+  <p>© 2026 <a href="https://gand.games/">GAND GAMES</a> · THE EMPIRE IS FICTIONAL · THE PAPERWORK IS NOT
+  <span class="quote">"Every office is waiting for another office."</span></p>
+</footer>
+
+</body>
+</html>
