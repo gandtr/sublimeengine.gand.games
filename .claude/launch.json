@@ -4,7 +4,7 @@
     {
       "name": "sublime-engine-site",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8318", "--directory", "/home/arda/projects/gand/sublimeengine.gand.games"],
+      "runtimeArgs": ["-m", "http.server", "8318", "--directory", "/home/arda/projects/games/sublime-engine/sublimeengine.gand.games"],
       "port": 8318
     }
   ]
